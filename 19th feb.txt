@@ -1,0 +1,289 @@
+restric area
+
+#include <mpi.h> 
+#include <stdio.h> 
+int main()
+{
+	int np;
+	int pid;
+	MPI_Init(NULL, NULL);
+	MPI_Comm_size(MPI_COMM_WORLD, &np);
+	MPI_Comm_rank(MPI_COMM_WORLD, &pid);
+	
+	if(pid==0){
+	printf("\n Hello world . . . \n My pid= %d \n No_of_process= %d", pid, np);
+	}
+	
+	MPI_Finalize();
+	return 0;
+}
+
+C:\Users\User\Desktop\2021ICT30\parallel com\feb 13\ConsoleApplication1\x64\Debug>mpiexec -n 5 ConsoleApplication1.exe
+
+ Hello world . . .
+ My pid= 0
+ No_of_process= 5
+ 
+ ------------------------------------
+ 
+ #include <mpi.h> 
+#include <stdio.h> 
+int main()
+{
+	int np;
+	int pid;
+	MPI_Init(NULL, NULL);
+	MPI_Comm_size(MPI_COMM_WORLD, &np);
+	MPI_Comm_rank(MPI_COMM_WORLD, &pid);
+
+	if (pid == 1 ) {
+		printf("\n Hello world . . . \n My pid= %d \n ", pid);
+	}
+
+	if (pid == 3) {
+		printf("\n university of vavuniya. \n My pid= %d \n ", pid);
+	}
+
+	MPI_Finalize();
+	return 0;
+}
+
+ No_of_process= 5
+C:\Users\User\Desktop\2021ICT30\parallel com\feb 13\ConsoleApplication1\x64\Debug>mpiexec -n 5 ConsoleApplication1.exe
+
+ university of vavuniya.
+ My pid= 3
+
+
+ Hello world . . .
+ My pid= 1
+ 
+ ------------------------------------
+ one to one communication between two process
+ 
+ mpi send, recieve
+ 
+ #include <mpi.h> 
+#include <stdio.h> 
+int main()
+{
+	int np;
+	int pid;
+	MPI_Init(NULL, NULL);
+	MPI_Comm_size(MPI_COMM_WORLD, &np);
+	MPI_Comm_rank(MPI_COMM_WORLD, &pid);
+
+	MPI_Status sta;
+
+	if (pid == 0 ) {
+		int num = 5;
+		MPI_Send(&num, 1, MPI_INT, 1, 50, MPI_COMM_WORLD);
+		printf("PID : %d, sent value: %d\n ", pid, num);
+	}
+	else if (pid == 1) {
+		int recv_num;
+		MPI_Recv(&recv_num, 1, MPI_INT, 0, 50, MPI_COMM_WORLD, &sta);
+		printf("PID : %d, sent value: %d\n ", pid, recv_num);
+	}
+
+	
+	MPI_Finalize();
+	return 0;
+}
+
+
+C:\Users\User\Desktop\2021ICT30\parallel com\feb 13\ConsoleApplication1\x64\Debug>mpiexec -n 5 ConsoleApplication1.exe
+PID : 1, sent value: 5
+
+PID : 0, sent value: 5
+
+------------------------------------------------------------------
+print the number 1 to 5
+(sent and recieve)
+
+#include <mpi.h> 
+#include <stdio.h> 
+int main()
+{
+	int np;
+	int pid;
+	MPI_Init(NULL, NULL);
+	MPI_Comm_size(MPI_COMM_WORLD, &np);
+	MPI_Comm_rank(MPI_COMM_WORLD, &pid);
+
+	MPI_Status sta;
+
+	if (pid == 0 ) {
+
+		int num[] = {1,2,3,4,5};
+
+		MPI_Send(&num, 5, MPI_INT, 1, 50, MPI_COMM_WORLD);
+		printf("My PID is: %d \n I sent ", pid);
+
+		for (int i=0; i <5 ; i ++) {
+			printf(" %d",  num[i]);
+		}
+	}
+	else if (pid == 1) {
+
+		int recv_num[5];
+
+		MPI_Recv(&recv_num, 5, MPI_INT, 0, 50, MPI_COMM_WORLD, &sta);
+		printf("My PID is: %d \n I recived ", pid);
+
+		for (int i = 0; i < 5; i++) {
+			printf(" %d", recv_num[i]);
+		}
+
+	}
+
+	
+	MPI_Finalize();
+	return 0;
+}
+
+C:\Users\User\Desktop\2021ICT30\parallel com\feb 13\ConsoleApplication1\x64\Debug>mpiexec -n 5 ConsoleApplication1.exe
+My PID is: 1
+ I recived  1 2 3 4 5
+My PID is: 0
+ I sent  1 2 3 4 5
+ 
+-------------------------------------------------
+
+summation of recieved numbers, pass/send the summation to PID=0
+
+<wrong>
+#include <mpi.h> 
+#include <stdio.h> 
+int main()
+{
+	int np;
+	int pid;
+	MPI_Init(NULL, NULL);
+	MPI_Comm_size(MPI_COMM_WORLD, &np);
+	MPI_Comm_rank(MPI_COMM_WORLD, &pid);
+
+	MPI_Status sta;
+	int  sum = 0;
+
+	if (pid == 0 ) {
+
+		int num[] = {1,2,3,4,5};
+
+		MPI_Send(&num, 5, MPI_INT, 1, 50, MPI_COMM_WORLD);
+		printf("My PID is: %d \n I sent ", pid);
+
+		for (int i=0; i <5 ; i ++) {
+			printf(" %d",  num[i]);
+		}
+	}
+	else if (pid == 1) {
+
+		int recv_num[5];
+		int  sum = 0;
+
+		MPI_Recv(&recv_num, 5, MPI_INT, 0, 50, MPI_COMM_WORLD, &sta);
+		printf("My PID is: %d \n I recived ", pid);
+
+		for (int i = 0; i < 5; i++) {
+			printf(" %d", recv_num[i]);
+			sum += recv_num[i];
+		}
+
+		printf("\n summation of recieved numbers: %d", sum);
+
+	}
+
+	
+	MPI_Finalize();
+	return 0;
+}
+
+
+
+
+C:\Users\User\Desktop\2021ICT30\parallel com\feb 13\ConsoleApplication1\x64\Debug>mpiexec -n 5 ConsoleApplication1.exe
+My PID is: 1
+ I recived  1 2 3 4 5
+ summation of recieved numbers: 15
+My PID is: 0
+ I sent  1 2 3 4 5
+ 
+ =======================
+ 
+
+#include <mpi.h> 
+#include <stdio.h> 
+int main()
+{
+	int np;
+	int pid;
+	int sum = 0;
+	MPI_Init(NULL, NULL);
+	MPI_Comm_size(MPI_COMM_WORLD, &np);
+	MPI_Comm_rank(MPI_COMM_WORLD, &pid);
+
+	MPI_Status sta;
+
+	if (pid == 0)
+	{
+		int num = 5;
+		MPI_Send (&num, 1,MPI_INT,1, 50, MPI_COMM_WORLD);
+		printf("PID : %d, Sent value: %d\n",pid,num);
+	}
+	else if (pid == 1){
+		int recv_num;
+		MPI_Recv(&recv_num,1,MPI_INT,0,50,MPI_COMM_WORLD,&sta);
+		printf("PID: %d, received value: %d\n", pid,recv_num);
+	}
+
+
+
+	if (pid == 0)
+	{
+		int num[5] = { 23, 45, 6, 87, 68 };
+
+		MPI_Send(num, 5, MPI_INT, 1, 60, MPI_COMM_WORLD);
+
+		printf("PID: %d, Sent array: ", pid);
+		for (int i = 0; i < 5; i++) {
+			printf("%d ", num[i]);
+		}
+		printf("\n");
+
+		MPI_Recv(&sum, 1, MPI_INT, 1, 70, MPI_COMM_WORLD, &sta);
+		printf("PID: %d, received value of sum: %d\n", pid, sum);
+	}
+	else if (pid == 1)
+	{
+		int recv_num[5];
+		int sum = 0;
+
+		MPI_Recv(recv_num, 5, MPI_INT, 0, 60, MPI_COMM_WORLD, &sta);
+
+		printf("PID: %d, Received array: ", pid);
+		for (int i = 0; i < 5; i++) {
+			printf("%d ", recv_num[i]);
+			sum += recv_num[i];
+
+		}
+
+		printf("\nSum = %d\n", sum);
+
+		MPI_Send(&sum, 1, MPI_INT, 0, 70, MPI_COMM_WORLD);
+		printf("PID : %d, Sent value of sum: %d\n", pid, sum);
+	}
+
+	MPI_Finalize();
+	return 0;
+}
+
+
+C:\Users\User\Desktop\2021ICT30\parallel com\feb 13\ConsoleApplication1\x64\Debug>mpiexec -n 4 ConsoleApplication1.exe
+PID : 0, Sent value: 5
+PID: 0, Sent array: 23 45 6 87 68
+PID: 0, received value of sum: 229
+PID: 1, received value: 5
+PID: 1, Received array: 23 45 6 87 68
+Sum = 229
+PID : 1, Sent value of sum: 229
